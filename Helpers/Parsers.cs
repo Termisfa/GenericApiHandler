@@ -46,9 +46,8 @@ namespace CryptoAlertsBot
                     var preCastedValue = row[i];
                     if (actualType == typeof(DateTime))
                         preCastedValue = Parsers.SqlFormatedStringToDateTimeFormat(preCastedValue);
-                    //TODO: add case for double changing . to ,
-                    //else if()
-                    //    preCastedValue = 
+                    else if (actualType == typeof(Double))
+                        preCastedValue = preCastedValue.Replace('.', ',');
 
                     var safeValue = (preCastedValue == null || preCastedValue == "null") ? null : Convert.ChangeType(preCastedValue, actualType);
 
