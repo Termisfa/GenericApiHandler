@@ -1,4 +1,5 @@
 ﻿using CryptoAlertsBot.Extensions;
+using GenericApiHandler.Helpers.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
@@ -25,39 +26,58 @@ namespace CryptoAlertsBot
             return result;
         }
 
-
-        public static List<T> HttpResultToListCustomObject<T>(string rawString) 
+        public static List<T> HttpResultToListCustomObject<T>(string rawString)
         {
-            List<T> result = new();
-
-            Type myType = typeof(T);
-            IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties().OrderBy(o => ((DisplayAttribute)o.GetCustomAttributes(typeof(DisplayAttribute), false)[0]).Order));
-
             var resultList = JsonSerializer.Deserialize<List<List<string>>>(rawString);
+            Dictionary<Type, List<PropertyInfo>> customObjectsList = new();
+            List<T> result = new();
+            List<PropertyInfo> mainObjProperties = typeof(T).GetPropertiesList();
+            bool isMultiObject = mainObjProperties[0].PropertyType.Namespace != "System";
+
+            if (isMultiObject)
+            {
+                foreach (var obj in mainObjProperties)
+                {
+                    Type typeList = obj.PropertyType;
+                    customObjectsList.Add(typeList, typeList.GetPropertiesList());
+                }
+            }
+            else
+                customObjectsList.Add(typeof(T), mainObjProperties);
 
             foreach (var row in resultList)
             {
-                T customObject = (T)Activator.CreateInstance(typeof(T));
+                T mainObject = (T)Activator.CreateInstance(typeof(T));
 
-                for (int i = 0; i < row.Count; i++)
+                int sqlColumnIndex = 0;
+
+                for (int i = 0; i < customObjectsList.Count; i++)
                 {
-                    var actualType = Nullable.GetUnderlyingType(props[i].PropertyType) ?? props[i].PropertyType;
+                    object? customObj;
 
-                    var preCastedValue = row[i];
-                    if (actualType == typeof(DateTime))
-                        preCastedValue = Parsers.SqlFormatedStringToDateTimeFormat(preCastedValue);
-                    else if (actualType == typeof(Double))
-                        preCastedValue = preCastedValue.Replace('.', ',');
+                    var typeAndPropertyinfoList = customObjectsList.ElementAt(i);
 
-                    var safeValue = (preCastedValue == null || preCastedValue == "null") ? null : Convert.ChangeType(preCastedValue, actualType);
+                    customObj = Activator.CreateInstance(Type.GetType(typeAndPropertyinfoList.Key.AssemblyQualifiedName));
 
-                    customObject.GetType().GetPropertyCustom(i).SetValue(customObject, safeValue);
+                    for (int propertyIndex = 0; propertyIndex < typeAndPropertyinfoList.Value.Count; propertyIndex++)
+                    {
+                        if (isMultiObject)
+                            customObj.CastAndAssignValueToObject(typeAndPropertyinfoList.Value[propertyIndex], row[sqlColumnIndex], propertyIndex);
+                        else
+                            mainObject.CastAndAssignValueToObject(typeAndPropertyinfoList.Value[propertyIndex], row[sqlColumnIndex], propertyIndex);
+
+                        sqlColumnIndex++;
+                    }
+
+                    if (isMultiObject)
+                        mainObject.GetType().GetPropertyCustom(i).SetValue(mainObject, customObj);
                 }
-
-                result.Add(customObject);
+                result.Add(mainObject);
             }
 
             return result;
         }
+
+
     }
 }

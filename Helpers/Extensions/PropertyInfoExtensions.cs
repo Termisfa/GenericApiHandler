@@ -5,11 +5,6 @@ namespace CryptoAlertsBot.Extensions
 {
     public static class PropertyInfoExtensions
     {
-        public static PropertyInfo GetPropertyCustom(this Type type, int index)
-        {
-            return type.GetProperties().FirstOrDefault(p => ((DisplayAttribute)p.GetCustomAttributes(typeof(DisplayAttribute), false)[0]).Order == index);
-        }
-
         public static string GetParsedString(this PropertyInfo propertyInfo, object obj)
         {
             string result = string.Empty;

@@ -6,9 +6,9 @@ namespace CryptoAlertsBot.ApiHandler
     public static class BuildAndExeApiCall
     {
 
-        public static async Task<List<T>> GetAllTable<T>(string schema = default)
+        public static async Task<List<T>> GetAllTable<T>(string table = default, string schema = default)
         {
-            string table = typeof(T).Name.ToLower();
+            table ??= typeof(T).Name.ToLower();
 
             string uri = ApiUriBuilder.GetAndDeleteBuilder(table, default, schema);
 
@@ -19,17 +19,17 @@ namespace CryptoAlertsBot.ApiHandler
             return list;
         }
 
-        public static Task<List<T>> GetWithOneArgument<T>(string argumentName, string argumentValue, string schema = default)
+        public static Task<List<T>> GetWithOneArgument<T>(string argumentName, string argumentValue, string table = default, string schema = default)
         {
             Dictionary<string, string> args = new();
             args.Add(argumentName, argumentValue);
 
-            return GetWithMultipleArguments<T>(args, schema);
+            return GetWithMultipleArguments<T>(args, table, schema);
         }
 
-        public static async Task<List<T>> GetWithMultipleArguments<T>(Dictionary<string, string> args, string schema = default)
+        public static async Task<List<T>> GetWithMultipleArguments<T>(Dictionary<string, string> args, string table = default, string schema = default)
         {
-            string table = typeof(T).Name.ToLower();
+            table ??= typeof(T).Name.ToLower();
 
             string uri = ApiUriBuilder.GetAndDeleteBuilder(table, args, schema);
 
