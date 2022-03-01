@@ -10,25 +10,16 @@ namespace CryptoAlertsBot.Extensions
             string result = string.Empty;
 
             var objValue = propertyInfo.GetValue(obj);
-            var objType = propertyInfo.PropertyType;
-
-            switch (Type.GetTypeCode(objType))
-            {
-                case TypeCode.DateTime:
-                    DateTime dtAux = Convert.ToDateTime(objValue);
-                    result = Parsers.DatetimeToStringSqlFormat(dtAux);
-                    break;
-
-                case TypeCode.Boolean:
-                    bool boolAux = Convert.ToBoolean(objValue);
-                    result = boolAux ? "1" : "0";
-                    break;
-
-                default:
-                    result = Convert.ToString(objValue);
-                    break;
-
-            }
+            var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
+            
+            if(actualType == typeof(DateTime))
+                result = Parsers.DatetimeToStringSqlFormat(Convert.ToDateTime(objValue));
+            else if(actualType == typeof(bool))
+                result = Convert.ToBoolean(objValue) ? "1" : "0";
+            else if(actualType == typeof(double))
+                result = Convert.ToString(objValue).Replace(',', '.');
+            else
+                result = Convert.ToString(objValue);
 
             return result;
         }
