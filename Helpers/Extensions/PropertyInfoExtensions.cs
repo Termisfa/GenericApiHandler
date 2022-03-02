@@ -10,6 +10,10 @@ namespace CryptoAlertsBot.Extensions
             string result = string.Empty;
 
             var objValue = propertyInfo.GetValue(obj);
+
+            if (objValue == null)
+                return null;
+
             var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
             
             if(actualType == typeof(DateTime))
