@@ -1,5 +1,4 @@
 ﻿using CryptoAlertsBot.ApiHandler.Helpers;
-using CryptoAlertsBot.Helpers;
 
 namespace CryptoAlertsBot.ApiHandler
 {
@@ -42,7 +41,7 @@ namespace CryptoAlertsBot.ApiHandler
 
         public static async Task<int> Post(string table, object obj, string schema = default)
         {
-            schema ??= ApiConstants.DB_SCHEMA;
+            schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
 
             HttpObject httpObject = new(schema, table, obj);
 
@@ -60,7 +59,7 @@ namespace CryptoAlertsBot.ApiHandler
             Dictionary<string, string> args = new();
             args.Add(argumentName, argumentValue);
 
-            schema ??= ApiConstants.DB_SCHEMA;
+            schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
 
             HttpObject httpObject = new(schema, table, obj);
 
@@ -75,7 +74,7 @@ namespace CryptoAlertsBot.ApiHandler
 
         public static async Task<int> PutWithMultipleArguments(string table, object obj, Dictionary<string, string> args, string schema = default)
         {
-            schema ??= ApiConstants.DB_SCHEMA;
+            schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
 
             HttpObject httpObject = new(schema, table, obj);
 

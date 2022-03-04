@@ -61,9 +61,9 @@
 
                 if(!httpResponseMessage.IsSuccessStatusCode)
                 {
-                    Logger.Log($"Error in '{method}' Api call. URI:" + httpResponseMessage.RequestMessage.RequestUri);
-                    Logger.Log(httpResponseMessage.StatusCode.ToString());
-                    Logger.Log(httpResponseMessage.ReasonPhrase);
+                    //Logger.Log($"Error in '{method}' Api call. URI:" + httpResponseMessage.RequestMessage.RequestUri);
+                    //Logger.Log(httpResponseMessage.StatusCode.ToString());
+                    //Logger.Log(httpResponseMessage.ReasonPhrase);
                     return false;
                 }
 
@@ -71,8 +71,8 @@
             }
             catch (Exception e)
             {
-                Logger.Log(e.Message);
-                Logger.Log(e.StackTrace);
+                //Logger.Log(e.Message);
+                //Logger.Log(e.StackTrace);
                 return false;
             }
         }

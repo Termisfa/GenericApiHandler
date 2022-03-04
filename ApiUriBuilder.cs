@@ -1,19 +1,12 @@
-﻿using CryptoAlertsBot.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CryptoAlertsBot.ApiHandler
+﻿namespace CryptoAlertsBot.ApiHandler
 {
     public static class ApiUriBuilder
     {
         public static string GetAndDeleteBuilder(string table, Dictionary<string, string> parameters = default, string? schema = default)
         {
-            string result = ApiConstants.BASE_URI + "?schema=";
+            string result = ApiAppSettingsManager.GetApiBaseUri() + "?schema=";
 
-            result += schema ?? ApiConstants.DB_SCHEMA;
+            result += schema ?? ApiAppSettingsManager.GetApiDefaultSchema();
 
             result += "&table=" + table;
 
@@ -35,13 +28,13 @@ namespace CryptoAlertsBot.ApiHandler
 
         public static string PostBuilder()
         {
-            return ApiConstants.BASE_URI;
+            return ApiAppSettingsManager.GetApiBaseUri();
         }
 
 
         public static string PutBuilder(Dictionary<string, string> parameters = default)
         {
-            string result = ApiConstants.BASE_URI;
+            string result = ApiAppSettingsManager.GetApiBaseUri();
 
             if (parameters != default)
             {

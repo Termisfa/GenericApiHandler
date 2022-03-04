@@ -1,5 +1,4 @@
-﻿using CryptoAlertsBot.Helpers;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 
 namespace CryptoAlertsBot.ApiHandler
 {
@@ -9,7 +8,7 @@ namespace CryptoAlertsBot.ApiHandler
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(baseAddress ?? ApiConstants.BASE_ADDRESS);
+                client.BaseAddress = new Uri(baseAddress ?? ApiAppSettingsManager.GetApiBaseAddress());
 
                 var result = await client.GetAsync(uri);
 
@@ -21,7 +20,7 @@ namespace CryptoAlertsBot.ApiHandler
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(baseAddress ?? ApiConstants.BASE_ADDRESS);
+                client.BaseAddress = new Uri(baseAddress ?? ApiAppSettingsManager.GetApiBaseAddress());
 
                 var result = await client.PostAsJsonAsync(uri, obj);
 
@@ -33,7 +32,7 @@ namespace CryptoAlertsBot.ApiHandler
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(baseAddress ?? ApiConstants.BASE_ADDRESS);
+                client.BaseAddress = new Uri(baseAddress ?? ApiAppSettingsManager.GetApiBaseAddress());
 
                 var result = await client.PutAsJsonAsync(uri, obj);
 
@@ -45,7 +44,7 @@ namespace CryptoAlertsBot.ApiHandler
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(baseAddress ?? ApiConstants.BASE_ADDRESS);
+                client.BaseAddress = new Uri(baseAddress ?? ApiAppSettingsManager.GetApiBaseAddress());
 
                 var result = await client.DeleteAsync(uri);
 
