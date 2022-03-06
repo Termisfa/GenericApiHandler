@@ -20,8 +20,8 @@ namespace CryptoAlertsBot.ApiHandler.Models
             if (string.IsNullOrEmpty(date))
                 return date;
 
-            if(DateTime.TryParseExact(date, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
-                return dt.ToString("dd/MM/yyyy HH:mm:ss");
+            //if(DateTime.TryParseExact(date, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
+            //    return dt.ToString("dd/MM/yyyy HH:mm:ss");
 
             return date;
         }

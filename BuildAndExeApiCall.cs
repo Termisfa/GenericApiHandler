@@ -21,10 +21,10 @@ namespace CryptoAlertsBot.ApiHandler
 
         public Task<List<T>> GetWithOneArgument<T>(string argumentName, string argumentValue, string table = default, string schema = default)
         {
-            Dictionary<string, string> args = new();
-            args.Add(argumentName, argumentValue);
+            Dictionary<string, string> parameters = new();
+            parameters.Add(argumentName, argumentValue);
 
-            return GetWithMultipleArguments<T>(args, table, schema);
+            return GetWithMultipleArguments<T>(parameters, table, schema);
         }
 
         public async Task<List<T>> GetWithMultipleArguments<T>(Dictionary<string, string> parameters, string table = default, string schema = default)
@@ -40,44 +40,44 @@ namespace CryptoAlertsBot.ApiHandler
 
         public async Task<int> Post(string table, object obj, string schema = default)
         {
-            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Post, table, schema, obj);
+            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Post, table, schema: schema, obj: obj);
 
             return result;
         }
 
         public async Task<int> PutWithOneArgument(string table, object obj, string argumentName, string argumentValue, string schema = default)
         {
-            Dictionary<string, string> args = new();
-            args.Add(argumentName, argumentValue);
+            Dictionary<string, string> parameters = new();
+            parameters.Add(argumentName, argumentValue);
 
-            return await PutWithMultipleArguments(table, obj, args, schema);
+            return await PutWithMultipleArguments(table, obj, parameters, schema);
         }
 
-        public async Task<int> PutWithMultipleArguments(string table, object obj, Dictionary<string, string> args, string schema = default)
+        public async Task<int> PutWithMultipleArguments(string table, object obj, Dictionary<string, string> parameters, string schema = default)
         {
-            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Put, table, schema, obj);
+            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Put, table, parameters, schema, obj);
 
             return result;
         }
 
         public async Task<int> DeleteWithOneArgument(string table, string argumentName, string argumentValue, string schema = default)
         {
-            Dictionary<string, string> args = new();
-            args.Add(argumentName, argumentValue);
+            Dictionary<string, string> parameters = new();
+            parameters.Add(argumentName, argumentValue);
 
-            return await DeleteWithMultipleArguments(table, args, schema);
+            return await DeleteWithMultipleArguments(table, parameters, schema);
         }
 
-        public async Task<int> DeleteWithMultipleArguments(string table, Dictionary<string, string> args, string schema = default)
+        public async Task<int> DeleteWithMultipleArguments(string table, Dictionary<string, string> parameters, string schema = default)
         {
-            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Delete, table, schema);
+            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Delete, table, parameters, schema);
 
             return result;
         }
 
-        private async Task<int> ExeAndParseIntResult(ApiCallTypesEnum apiCallType, string table, string schema = default, object obj = default)
+        private async Task<int> ExeAndParseIntResult(ApiCallTypesEnum apiCallType, string table, Dictionary<string, string> parameters = default, string schema = default, object obj = default)
         {
-            Response response = await BuildAndExe(apiCallType, table, schema: schema, obj: obj);
+            Response response = await BuildAndExe(apiCallType, table, parameters, schema, obj);
 
             if (int.TryParse(response.Result, out int result))
             {
@@ -86,7 +86,6 @@ namespace CryptoAlertsBot.ApiHandler
 
             return 0;
         }
-
 
         private async Task<Response> BuildAndExe(ApiCallTypesEnum apiCallType, string table, Dictionary<string, string> parameters = default, string schema = default, object obj = default)
         {
@@ -102,7 +101,7 @@ namespace CryptoAlertsBot.ApiHandler
 
             if (!response.Success)
             {
-                _logEvent.Log(response.ErrorInfo);
+                _logEvent.Log(response);
             }
 
             return response;

@@ -20,7 +20,7 @@ namespace CryptoAlertsBot.ApiHandler.Helpers
                         ErrorInfo = new()
                         {
                             Message = $"Status code: {httpResponseMessage.StatusCode}. Reason: {httpResponseMessage.ReasonPhrase}",
-                            StackTrace = String.Empty
+                            StackTrace = httpResponseMessage.RequestMessage.ToString()
                         }
                     };
                 }
@@ -36,49 +36,6 @@ namespace CryptoAlertsBot.ApiHandler.Helpers
             {
                 throw;
             }
-        }
-
-        public async static Task<List<T>> ResponseGetToObject<T>(string resultContent)
-        {
-            List<T> result = Parsers.HttpResultToListCustomObject<T>(resultContent);
-
-            return result;
-        }
-
-        public async static Task<int> ResponsePostToObject(HttpResponseMessage? httpResponseMessage)
-        {
-            if(!ResponseWasOk(httpResponseMessage))
-                return 0;
-
-            string resultContent = await httpResponseMessage.Content.ReadAsStringAsync();
-
-            var result = int.Parse(resultContent);
-
-            return result;
-        }
-
-        public async static Task<int> ResponsePutToObject(HttpResponseMessage? httpResponseMessage)
-        {
-            if(!ResponseWasOk(httpResponseMessage))
-                return 0;
-
-            string resultContent = await httpResponseMessage.Content.ReadAsStringAsync();
-
-            var result = int.Parse(resultContent);
-
-            return result;
-        }
-
-        public async static Task<int> ResponseDeleteToObject(HttpResponseMessage? httpResponseMessage)
-        {
-            if(!ResponseWasOk(httpResponseMessage))
-                return 0;
-
-            string resultContent = await httpResponseMessage.Content.ReadAsStringAsync();
-
-            var result = int.Parse(resultContent);
-
-            return result;
         }
 
         private static bool ResponseWasOk(HttpResponseMessage? httpResponseMessage)

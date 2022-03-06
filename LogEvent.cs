@@ -11,17 +11,17 @@ namespace GenericApiHandler
     {
         public event LogEventHandler FireEvent;
         public EventArgs e = null;
-        public delegate void LogEventHandler(LogEvent m, EventArgs e, ErrorInfo errorInfo);
+        public delegate void LogEventHandler(LogEvent m, EventArgs e, Response response);
 
         public LogEvent()
         {
         }
 
-        public void Log(ErrorInfo errorInfo)
+        public void Log(Response response)
         {
             if (FireEvent != null)
             {
-                FireEvent(this, e, errorInfo);
+                FireEvent(this, e, response);
             }
         }
 

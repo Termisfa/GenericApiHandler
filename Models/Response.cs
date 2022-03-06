@@ -9,31 +9,36 @@ namespace CryptoAlertsBot.ApiHandler.Models
 
         public string Result { get; set; }
 
-        public static Response SuccesfulResponse(string result)
+        public string UsedQuery { get; set; }
+
+        public static Response SuccesfulResponse(string result, string query = default)
         {
             return new Response()
             {
                 Success = true,
-                Result = result
+                Result = result,
+                UsedQuery = query
             };
         }
 
-        public static Response UnsuccesfulResponse(ErrorInfo errorInfo)
+        public static Response UnsuccesfulResponse(ErrorInfo errorInfo, string query = default)
         {
             return new Response()
             {
                 Success = false,
-                ErrorInfo = errorInfo
+                ErrorInfo = errorInfo,
+                UsedQuery = query
             };
         }
 
-        public static Response UnsuccesfulResponseFromException(Exception exc)
+        public static Response UnsuccesfulResponseFromException(Exception exc, string query = default)
         {
             ErrorInfo errorInfo = ErrorInfo.ErrorFromException(exc);
             return new Response()
             {
                 Success = false,
-                ErrorInfo = errorInfo
+                ErrorInfo = errorInfo,
+                UsedQuery = query
             };
         }
     }
