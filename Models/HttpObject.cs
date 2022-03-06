@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace CryptoAlertsBot
+namespace CryptoAlertsBot.ApiHandler.Models
 {
     public class HttpObject
     {

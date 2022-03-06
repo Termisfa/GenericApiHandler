@@ -1,11 +1,10 @@
 ﻿using CryptoAlertsBot.Extensions;
 using GenericApiHandler.Helpers.Extensions;
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 
-namespace CryptoAlertsBot
+namespace CryptoAlertsBot.ApiHandler.Models
 {
     public static class Parsers
     {
@@ -29,6 +28,11 @@ namespace CryptoAlertsBot
 
         public static List<T> HttpResultToListCustomObject<T>(string rawString)
         {
+            if(string.IsNullOrEmpty(rawString))
+            {
+                return new(); //TODO CHANGE TO RETURN NULL
+            }    
+
             var resultList = JsonSerializer.Deserialize<List<List<string>>>(rawString);
             Dictionary<Type, List<PropertyInfo>> customObjectsList = new();
             List<T> result = new();

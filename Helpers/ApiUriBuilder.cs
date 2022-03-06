@@ -1,8 +1,33 @@
-﻿namespace CryptoAlertsBot.ApiHandler
+﻿using GenericApiHandler.Data.Enums;
+
+namespace CryptoAlertsBot.ApiHandler
 {
     public static class ApiUriBuilder
     {
-        public static string GetAndDeleteBuilder(string table, Dictionary<string, string> parameters = default, string? schema = default)
+        public static string BuildUri(ApiCallTypesEnum apiCallTypes, string schema, string table = default, Dictionary<string, string> parameters = default)
+        {
+            try
+            {
+                switch (apiCallTypes)
+                {
+                    case ApiCallTypesEnum.Get:
+                    case ApiCallTypesEnum.Delete:
+                        return GetAndDeleteBuilder(table, parameters, schema);
+                    case ApiCallTypesEnum.Post:
+                        return ApiAppSettingsManager.GetApiBaseUri();
+                    case ApiCallTypesEnum.Put:
+                        return PutBuilder(parameters);
+                    default:
+                        return String.Empty;
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
+        private static string GetAndDeleteBuilder(string table, Dictionary<string, string> parameters = default, string? schema = default)
         {
             string result = ApiAppSettingsManager.GetApiBaseUri() + "?schema=";
 
@@ -26,13 +51,8 @@
             return result;
         }
 
-        public static string PostBuilder()
-        {
-            return ApiAppSettingsManager.GetApiBaseUri();
-        }
 
-
-        public static string PutBuilder(Dictionary<string, string> parameters = default)
+        private static string PutBuilder(Dictionary<string, string> parameters = default)
         {
             string result = ApiAppSettingsManager.GetApiBaseUri();
 

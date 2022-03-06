@@ -1,24 +1,25 @@
 ﻿using CryptoAlertsBot.ApiHandler.Helpers;
+using CryptoAlertsBot.ApiHandler.Models;
+using GenericApiHandler;
+using GenericApiHandler.Data.Enums;
 
 namespace CryptoAlertsBot.ApiHandler
 {
-    public static class BuildAndExeApiCall
+    public class BuildAndExeApiCall
     {
+        private readonly LogEvent _logEvent;
 
-        public static async Task<List<T>> GetAllTable<T>(string table = default, string schema = default)
+        public BuildAndExeApiCall(LogEvent logEvent)
         {
-            table ??= typeof(T).Name.ToLower();
-
-            string uri = ApiUriBuilder.GetAndDeleteBuilder(table, default, schema);
-
-            var httpResponse = await ApiCalls.Get(uri);
-
-            List<T> list = await HttpResponseHandler.ResponseGetToObject<T>(httpResponse);
-
-            return list;
+            _logEvent = logEvent;
         }
 
-        public static Task<List<T>> GetWithOneArgument<T>(string argumentName, string argumentValue, string table = default, string schema = default)
+        public async Task<List<T>> GetAllTable<T>(string table = default, string schema = default)
+        {
+            return await GetWithMultipleArguments<T>(default, table, schema);
+        }
+
+        public Task<List<T>> GetWithOneArgument<T>(string argumentName, string argumentValue, string table = default, string schema = default)
         {
             Dictionary<string, string> args = new();
             args.Add(argumentName, argumentValue);
@@ -26,92 +27,85 @@ namespace CryptoAlertsBot.ApiHandler
             return GetWithMultipleArguments<T>(args, table, schema);
         }
 
-        public static async Task<List<T>> GetWithMultipleArguments<T>(Dictionary<string, string> args, string table = default, string schema = default)
+        public async Task<List<T>> GetWithMultipleArguments<T>(Dictionary<string, string> parameters, string table = default, string schema = default)
         {
             table ??= typeof(T).Name.ToLower();
 
-            string uri = ApiUriBuilder.GetAndDeleteBuilder(table, args, schema);
+            Response response = await BuildAndExe(ApiCallTypesEnum.Get, table, parameters, schema);
 
-            var httpResponse = await ApiCalls.Get(uri);
+            List<T> result = Parsers.HttpResultToListCustomObject<T>(response.Result);
 
-            List<T> list = await HttpResponseHandler.ResponseGetToObject<T>(httpResponse);
-
-            return list;
+            return result;
         }
 
-        public static async Task<int> Post(string table, object obj, string schema = default)
+        public async Task<int> Post(string table, object obj, string schema = default)
         {
-            schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
+            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Post, table, schema, obj);
 
-            HttpObject httpObject = new(schema, table, obj);
-
-            string uri = ApiUriBuilder.PostBuilder();
-
-            var httpResponse = await ApiCalls.Post(uri, httpObject);
-
-            var affectedRows = await HttpResponseHandler.ResponsePostToObject(httpResponse);
-
-            return affectedRows;
+            return result;
         }
 
-        public static async Task<int> PutWithOneArgument(string table, object obj, string argumentName, string argumentValue, string schema = default)
+        public async Task<int> PutWithOneArgument(string table, object obj, string argumentName, string argumentValue, string schema = default)
         {
             Dictionary<string, string> args = new();
             args.Add(argumentName, argumentValue);
 
-            schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
-
-            HttpObject httpObject = new(schema, table, obj);
-
-            string uri = ApiUriBuilder.PutBuilder(args);
-
-            var httpResponse = await ApiCalls.Put(uri, httpObject);
-
-            var affectedRows = await HttpResponseHandler.ResponsePutToObject(httpResponse);
-
-            return affectedRows;
+            return await PutWithMultipleArguments(table, obj, args, schema);
         }
 
-        public static async Task<int> PutWithMultipleArguments(string table, object obj, Dictionary<string, string> args, string schema = default)
+        public async Task<int> PutWithMultipleArguments(string table, object obj, Dictionary<string, string> args, string schema = default)
         {
-            schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
+            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Put, table, schema, obj);
 
-            HttpObject httpObject = new(schema, table, obj);
-
-            string uri = ApiUriBuilder.PutBuilder(args);
-
-            var httpResponse = await ApiCalls.Put(uri, httpObject);
-
-            var affectedRows = await HttpResponseHandler.ResponsePutToObject(httpResponse);
-
-            return affectedRows;
+            return result;
         }
 
-        public static async Task<int> DeleteWithMultipleArguments(string table, Dictionary<string, string> args, string schema = default)
-        {
-            string uri = ApiUriBuilder.GetAndDeleteBuilder(table, args, schema);
-
-            var httpResponse = await ApiCalls.Delete(uri);
-
-            var affectedRows = await HttpResponseHandler.ResponseDeleteToObject(httpResponse);
-
-            return affectedRows;
-        }
-
-        public static async Task<int> DeleteWithOneArgument(string table, string argumentName, string argumentValue, string schema = default)
+        public async Task<int> DeleteWithOneArgument(string table, string argumentName, string argumentValue, string schema = default)
         {
             Dictionary<string, string> args = new();
             args.Add(argumentName, argumentValue);
 
-            string uri = ApiUriBuilder.GetAndDeleteBuilder(table, args, schema);
+            return await DeleteWithMultipleArguments(table, args, schema);
+        }
 
-            var httpResponse = await ApiCalls.Delete(uri);
+        public async Task<int> DeleteWithMultipleArguments(string table, Dictionary<string, string> args, string schema = default)
+        {
+            int result = await ExeAndParseIntResult(ApiCallTypesEnum.Delete, table, schema);
 
-            var affectedRows = await HttpResponseHandler.ResponseDeleteToObject(httpResponse);
+            return result;
+        }
 
-            return affectedRows;
+        private async Task<int> ExeAndParseIntResult(ApiCallTypesEnum apiCallType, string table, string schema = default, object obj = default)
+        {
+            Response response = await BuildAndExe(apiCallType, table, schema: schema, obj: obj);
+
+            if (int.TryParse(response.Result, out int result))
+            {
+                return result;
+            }
+
+            return 0;
         }
 
 
+        private async Task<Response> BuildAndExe(ApiCallTypesEnum apiCallType, string table, Dictionary<string, string> parameters = default, string schema = default, object obj = default)
+        {
+            schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
+
+            HttpObject httpObject = obj == null ? default : new(schema, table, obj);
+
+            string uri = ApiUriBuilder.BuildUri(apiCallType, schema, table, parameters);
+
+            var httpResponse = await ApiCalls.ExeCall(apiCallType, uri, httpObject);
+
+            Response response = HttpResponseHandler.GetResponseFromHttpAsync(httpResponse).Result;
+
+            if (!response.Success)
+            {
+                _logEvent.Log(response.ErrorInfo);
+            }
+
+            return response;
+        }
     }
 }

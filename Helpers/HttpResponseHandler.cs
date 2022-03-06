@@ -1,14 +1,45 @@
-﻿namespace CryptoAlertsBot.ApiHandler.Helpers
+﻿using CryptoAlertsBot.ApiHandler.Models;
+using Newtonsoft.Json;
+
+namespace CryptoAlertsBot.ApiHandler.Helpers
 {
     public static class HttpResponseHandler
     {
-        public async static Task<List<T>> ResponseGetToObject<T>(HttpResponseMessage? httpResponseMessage)
+        public static async Task<Response> GetResponseFromHttpAsync(HttpResponseMessage? httpResponseMessage)
         {
-            if(!ResponseWasOk(httpResponseMessage, "GET"))
-                return new List<T>();
+            try
+            {
+                Response response;
 
-            string resultContent = await httpResponseMessage.Content.ReadAsStringAsync();
+                if (!ResponseWasOk(httpResponseMessage))
+                {
+                    response = new()
+                    {
+                        Result = string.Empty,
+                        Success = false,
+                        ErrorInfo = new()
+                        {
+                            Message = $"Status code: {httpResponseMessage.StatusCode}. Reason: {httpResponseMessage.ReasonPhrase}",
+                            StackTrace = String.Empty
+                        }
+                    };
+                }
+                else
+                {
+                    string responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    response = JsonConvert.DeserializeObject<Response>(responseString);
+                }
 
+                return response;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
+        public async static Task<List<T>> ResponseGetToObject<T>(string resultContent)
+        {
             List<T> result = Parsers.HttpResultToListCustomObject<T>(resultContent);
 
             return result;
@@ -16,7 +47,7 @@
 
         public async static Task<int> ResponsePostToObject(HttpResponseMessage? httpResponseMessage)
         {
-            if(!ResponseWasOk(httpResponseMessage, "POST"))
+            if(!ResponseWasOk(httpResponseMessage))
                 return 0;
 
             string resultContent = await httpResponseMessage.Content.ReadAsStringAsync();
@@ -28,7 +59,7 @@
 
         public async static Task<int> ResponsePutToObject(HttpResponseMessage? httpResponseMessage)
         {
-            if(!ResponseWasOk(httpResponseMessage, "PUT"))
+            if(!ResponseWasOk(httpResponseMessage))
                 return 0;
 
             string resultContent = await httpResponseMessage.Content.ReadAsStringAsync();
@@ -40,7 +71,7 @@
 
         public async static Task<int> ResponseDeleteToObject(HttpResponseMessage? httpResponseMessage)
         {
-            if(!ResponseWasOk(httpResponseMessage, "DELETE"))
+            if(!ResponseWasOk(httpResponseMessage))
                 return 0;
 
             string resultContent = await httpResponseMessage.Content.ReadAsStringAsync();
@@ -50,9 +81,7 @@
             return result;
         }
 
-
-
-        public static bool ResponseWasOk(HttpResponseMessage? httpResponseMessage, string method)
+        private static bool ResponseWasOk(HttpResponseMessage? httpResponseMessage)
         {
             try
             {
@@ -61,9 +90,6 @@
 
                 if(!httpResponseMessage.IsSuccessStatusCode)
                 {
-                    //Logger.Log($"Error in '{method}' Api call. URI:" + httpResponseMessage.RequestMessage.RequestUri);
-                    //Logger.Log(httpResponseMessage.StatusCode.ToString());
-                    //Logger.Log(httpResponseMessage.ReasonPhrase);
                     return false;
                 }
 
@@ -71,11 +97,8 @@
             }
             catch (Exception e)
             {
-                //Logger.Log(e.Message);
-                //Logger.Log(e.StackTrace);
                 return false;
             }
         }
-
     }
 }
