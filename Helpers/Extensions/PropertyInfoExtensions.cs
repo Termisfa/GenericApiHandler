@@ -8,25 +8,32 @@ namespace CryptoAlertsBot.Extensions
     {
         public static string GetParsedString(this PropertyInfo propertyInfo, object obj)
         {
-            string result = string.Empty;
+            try
+            {
+                string result = string.Empty;
 
-            var objValue = propertyInfo.GetValue(obj);
+                var objValue = propertyInfo.GetValue(obj);
 
-            if (objValue == null)
-                return null;
+                if (objValue == null)
+                    return null;
 
-            var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
-            
-            if(actualType == typeof(DateTime))
-                result = Parsers.DatetimeToStringSqlFormat(Convert.ToDateTime(objValue));
-            else if(actualType == typeof(bool))
-                result = Convert.ToBoolean(objValue) ? "1" : "0";
-            else if(actualType == typeof(double))
-                result = Convert.ToString(objValue).Replace(',', '.');
-            else
-                result = Convert.ToString(objValue);
+                var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
 
-            return result;
+                if (actualType == typeof(DateTime))
+                    result = Parsers.DatetimeToStringSqlFormat(Convert.ToDateTime(objValue));
+                else if (actualType == typeof(bool))
+                    result = Convert.ToBoolean(objValue) ? "1" : "0";
+                else if (actualType == typeof(double))
+                    result = Convert.ToString(objValue).Replace(',', '.');
+                else
+                    result = Convert.ToString(objValue);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
     }
 }

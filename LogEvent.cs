@@ -19,22 +19,17 @@ namespace GenericApiHandler
 
         public void Log(Response response)
         {
-            if (FireEvent != null)
+            try
             {
-                FireEvent(this, e, response);
+                if (FireEvent != null)
+                {
+                    FireEvent(this, e, response);
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
             }
         }
-
-        //public void Start()
-        //{
-        //    while (true)
-        //    {
-        //        System.Threading.Thread.Sleep(3000);
-        //        if (FireEvent != null)
-        //        {
-        //            FireEvent(this, e);
-        //        }
-        //    }
-        //}
     }
 }

@@ -29,47 +29,60 @@ namespace CryptoAlertsBot.ApiHandler
 
         private static string GetAndDeleteBuilder(string table, Dictionary<string, string> parameters = default, string? schema = default)
         {
-            string result = ApiAppSettingsManager.GetApiBaseUri() + "?schema=";
-
-            result += schema ?? ApiAppSettingsManager.GetApiDefaultSchema();
-
-            result += "&table=" + table;
-
-            if (parameters != default)
+            try
             {
-                result += "&parameters=(";
+                string result = ApiAppSettingsManager.GetApiBaseUri() + "?schema=";
 
-                foreach (KeyValuePair<string, string> kvp in parameters)
+                result += schema ?? ApiAppSettingsManager.GetApiDefaultSchema();
+
+                result += "&table=" + table;
+
+                if (parameters != default)
                 {
-                    result += kvp.Key + "=" + kvp.Value + "|";
+                    result += "&parameters=(";
+
+                    foreach (KeyValuePair<string, string> kvp in parameters)
+                    {
+                        result += kvp.Key + "=" + kvp.Value + "|";
+                    }
+
+                    result = result.Substring(0, result.Length - 1); //To remove the last '|'
+                    result += ")";
                 }
 
-                result = result.Substring(0, result.Length - 1); //To remove the last '|'
-                result += ")";
+                return result;
             }
-
-            return result;
+            catch (Exception e)
+            {
+                throw;
+            }
         }
-
 
         private static string PutBuilder(Dictionary<string, string> parameters = default)
         {
-            string result = ApiAppSettingsManager.GetApiBaseUri();
-
-            if (parameters != default)
+            try
             {
-                result += "?parameters=(";
+                string result = ApiAppSettingsManager.GetApiBaseUri();
 
-                foreach (KeyValuePair<string, string> kvp in parameters)
+                if (parameters != default)
                 {
-                    result += kvp.Key + "=" + kvp.Value + "|";
+                    result += "?parameters=(";
+
+                    foreach (KeyValuePair<string, string> kvp in parameters)
+                    {
+                        result += kvp.Key + "=" + kvp.Value + "|";
+                    }
+
+                    result = result.Substring(0, result.Length - 1); //To remove the last '|'
+                    result += ")";
                 }
 
-                result = result.Substring(0, result.Length - 1); //To remove the last '|'
-                result += ")";
+                return result;
             }
-
-            return result;
+            catch (Exception e)
+            {
+                throw;
+            }
         }
     }
 }
