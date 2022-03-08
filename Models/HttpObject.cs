@@ -16,10 +16,17 @@ namespace CryptoAlertsBot.ApiHandler.Models
 
         public HttpObject(string schema, string table, object obj)
         {
-            this.Schema = schema;
-            this.Table = table;
+            try
+            {
+                this.Schema = schema;
+                this.Table = table;
 
-            NameValueDict = ParseObjectToDict(obj);
+                NameValueDict = ParseObjectToDict(obj);
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         private static Dictionary<string, string> ParseObjectToDict(object obj)
