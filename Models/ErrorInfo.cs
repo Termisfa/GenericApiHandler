@@ -11,12 +11,12 @@ namespace CryptoAlertsBot.ApiHandler.Models
 
         public static ErrorInfo ErrorFromException(Exception exc)
         {
-            MethodBase? method = new StackTrace().GetFrame(3)?.GetMethod();
-            return new ErrorInfo()
+            try
             {
-                Message = exc.Message,
-                StackTrace = exc.StackTrace
-            };
+                MethodBase? method = new StackTrace().GetFrame(3)?.GetMethod();
+                return new ErrorInfo() { Message = exc.Message, StackTrace = exc.StackTrace };
+            }
+            catch (Exception e) { throw; }
         }
     }
 }

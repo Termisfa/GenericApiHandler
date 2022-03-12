@@ -9,16 +9,25 @@ namespace GenericApiHandler.Helpers.Extensions
     {
         public static void CastAndAssignValueToObject(this Object? obj, PropertyInfo propertyInfo, dynamic preCastedValue, int propertyOrderIndex)
         {
-            var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
+            try
+            {
+                dynamic? safeValue = null;
 
-            if (actualType == typeof(DateTime))
-                preCastedValue = Parsers.SqlFormatedStringToDateTimeFormat(preCastedValue);
-            else if (actualType == typeof(Double))
-                preCastedValue = preCastedValue.Replace('.', ',');
+                if (preCastedValue != null && preCastedValue != "null")
+                {
+                    var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
 
-            var safeValue = (preCastedValue == null || preCastedValue == "null") ? null : Convert.ChangeType(preCastedValue, actualType);
+                    if (actualType == typeof(DateTime))
+                        preCastedValue = Parsers.SqlFormatedStringToDateTimeFormat(preCastedValue);
+                    else if (actualType == typeof(Double))
+                        preCastedValue = preCastedValue.Replace('.', ',');
 
-            obj.GetType().GetPropertyCustom(propertyOrderIndex).SetValue(obj, safeValue);
+                    safeValue = Convert.ChangeType(preCastedValue, actualType);
+                }
+
+                obj.GetType().GetPropertyCustom(propertyOrderIndex).SetValue(obj, safeValue);
+            }
+            catch (Exception e) { throw; }
         }
     }
 }

@@ -19,9 +19,16 @@ namespace GenericApiHandler
 
         public void Log(Response response = default, Exception exc = default)
         {
-            if (FireEvent != null)
+            try
             {
-                FireEvent(this, e, response, exc);
+                if (FireEvent != null)
+                {
+                    FireEvent(this, e, response, exc);
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
             }
         }
     }
