@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Configuration;
 
 namespace CryptoAlertsBot
 {
@@ -37,6 +32,16 @@ namespace CryptoAlertsBot
         public static string GetApiDefaultSchema()
         {
             return ConfigurationManager.AppSettings.Get("ApiDefaultSchema");
+        }
+
+        public static string GetSchemaUserName()
+        {
+            return ConfigurationManager.AppSettings.Get("SchemaUserName");
+        }
+
+        public static string GetSchemaUserPassw()
+        {
+            return ConfigurationManager.AppSettings.Get("SchemaUserPassw");
         }
     }
 }

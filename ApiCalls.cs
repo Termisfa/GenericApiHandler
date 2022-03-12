@@ -5,16 +5,25 @@ namespace CryptoAlertsBot.ApiHandler
 {
     public static class ApiCalls
     {
-        public static async Task<HttpResponseMessage?> ExeCall(ApiCallTypesEnum callType, string uri, object obj = default, string? baseAddress = default)
+        public static async Task<HttpResponseMessage?> ExeCall(ApiCallTypesEnum callType, string uri, object obj = default, string? baseAddress = default, string schema = default, string apiToken = default)
         {
             try
             {
                 if (obj == default && (callType == ApiCallTypesEnum.Post || callType == ApiCallTypesEnum.Put))
+                {
                     return default;
+                }
 
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri(baseAddress ?? ApiAppSettingsManager.GetApiBaseAddress());
+
+                    client.DefaultRequestHeaders.Add("schema", schema ?? ApiAppSettingsManager.GetApiDefaultSchema());
+
+                    if (apiToken != default)
+                    {
+                        client.DefaultRequestHeaders.Add("Authorization", apiToken);
+                    }
 
                     switch (callType)
                     {

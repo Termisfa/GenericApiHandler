@@ -11,30 +11,18 @@ namespace GenericApiHandler
     {
         public event LogEventHandler FireEvent;
         public EventArgs e = null;
-        public delegate void LogEventHandler(LogEvent m, EventArgs e, Response response);
+        public delegate void LogEventHandler(LogEvent m, EventArgs e, Response response = default, Exception exc = default);
 
         public LogEvent()
         {
         }
 
-        public void Log(Response response)
+        public void Log(Response response = default, Exception exc = default)
         {
             if (FireEvent != null)
             {
-                FireEvent(this, e, response);
+                FireEvent(this, e, response, exc);
             }
         }
-
-        //public void Start()
-        //{
-        //    while (true)
-        //    {
-        //        System.Threading.Thread.Sleep(3000);
-        //        if (FireEvent != null)
-        //        {
-        //            FireEvent(this, e);
-        //        }
-        //    }
-        //}
     }
 }

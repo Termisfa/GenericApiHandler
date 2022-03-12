@@ -1,4 +1,5 @@
 ﻿using CryptoAlertsBot.ApiHandler.Models;
+using GenericApiHandler.Authentication;
 using Newtonsoft.Json;
 
 namespace CryptoAlertsBot.ApiHandler.Helpers
@@ -11,7 +12,12 @@ namespace CryptoAlertsBot.ApiHandler.Helpers
             {
                 Response response;
 
-                if (!ResponseWasOk(httpResponseMessage))
+                if (ResponseWasOk(httpResponseMessage))
+                {
+                    string responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    response = JsonConvert.DeserializeObject<Response>(responseString);
+                }
+                else
                 {
                     response = new()
                     {
@@ -24,10 +30,25 @@ namespace CryptoAlertsBot.ApiHandler.Helpers
                         }
                     };
                 }
-                else
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
+        public static async Task<AuthenticateResponse> GetResponseFromAuthAsync(HttpResponseMessage? httpResponseMessage)
+        {
+            try
+            {
+                AuthenticateResponse response = default;
+
+                if (ResponseWasOk(httpResponseMessage))
                 {
                     string responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-                    response = JsonConvert.DeserializeObject<Response>(responseString);
+                    response = JsonConvert.DeserializeObject<AuthenticateResponse>(responseString);
                 }
 
                 return response;
@@ -37,6 +58,8 @@ namespace CryptoAlertsBot.ApiHandler.Helpers
                 throw;
             }
         }
+
+
 
         private static bool ResponseWasOk(HttpResponseMessage? httpResponseMessage)
         {
