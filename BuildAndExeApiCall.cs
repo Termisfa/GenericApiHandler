@@ -3,6 +3,7 @@ using CryptoAlertsBot.ApiHandler.Models;
 using GenericApiHandler;
 using GenericApiHandler.Authentication;
 using GenericApiHandler.Data.Enums;
+using GenericApiHandler.Models;
 
 namespace CryptoAlertsBot.ApiHandler
 {
@@ -21,7 +22,7 @@ namespace CryptoAlertsBot.ApiHandler
         {
             try
             {
-                return await GetWithMultipleArguments<T>(default, table, schema);
+                return await GetWithMultipleParameters<T>(default, table, schema);
             }
             catch (Exception e)
             {
@@ -29,14 +30,11 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        public Task<List<T>> GetWithOneArgument<T>(string argumentName, string argumentValue, string table = default, string schema = default)
+        public Task<List<T>> GetWithOneParameter<T>(HttpParameter parameter, string table = default, string schema = default)
         {
             try
             {
-                Dictionary<string, string> parameters = new();
-                parameters.Add(argumentName, argumentValue);
-
-                return GetWithMultipleArguments<T>(parameters, table, schema);
+                return GetWithMultipleParameters<T>(new List<HttpParameter>() { parameter }, table, schema);
             }
             catch (Exception e)
             {
@@ -44,7 +42,7 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        public async Task<List<T>> GetWithMultipleArguments<T>(Dictionary<string, string> parameters, string table = default, string schema = default)
+        public async Task<List<T>> GetWithMultipleParameters<T>(List<HttpParameter> parameters, string table = default, string schema = default)
         {
             try
             {
@@ -76,14 +74,11 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        public async Task<int> PutWithOneArgument(string table, object obj, string argumentName, string argumentValue, string schema = default)
+        public async Task<int> PutWithOneParameter(string table, object obj, HttpParameter parameter, string schema = default)
         {
             try
             {
-                Dictionary<string, string> parameters = new();
-                parameters.Add(argumentName, argumentValue);
-
-                return await PutWithMultipleArguments(table, obj, parameters, schema);
+                return await PutWithMultipleParameters(table, obj, new List<HttpParameter>() { parameter }, schema);
             }
             catch (Exception e)
             {
@@ -91,7 +86,7 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        public async Task<int> PutWithMultipleArguments(string table, object obj, Dictionary<string, string> parameters, string schema = default)
+        public async Task<int> PutWithMultipleParameters(string table, object obj, List<HttpParameter> parameters, string schema = default)
         {
             try
             {
@@ -105,14 +100,11 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        public async Task<int> DeleteWithOneArgument(string table, string argumentName, string argumentValue, string schema = default)
+        public async Task<int> DeleteWithOneParameter(string table, HttpParameter parameter, string schema = default)
         {
             try
             {
-                Dictionary<string, string> parameters = new();
-                parameters.Add(argumentName, argumentValue);
-
-                return await DeleteWithMultipleArguments(table, parameters, schema);
+                return await DeleteWithMultipleParameters(table, new List<HttpParameter>() { parameter }, schema);
             }
             catch (Exception e)
             {
@@ -120,7 +112,7 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        public async Task<int> DeleteWithMultipleArguments(string table, Dictionary<string, string> parameters, string schema = default)
+        public async Task<int> DeleteWithMultipleParameters(string table, List<HttpParameter> parameters, string schema = default)
         {
             try
             {
@@ -134,7 +126,7 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        private async Task<int> ExeAndParseIntResult(ApiCallTypesEnum apiCallType, string table, Dictionary<string, string> parameters = default, string schema = default, object obj = default)
+        private async Task<int> ExeAndParseIntResult(ApiCallTypesEnum apiCallType, string table, List<HttpParameter> parameters = default, string schema = default, object obj = default)
         {
             try
             {
@@ -153,7 +145,7 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        private async Task<Response> BuildAndExe(ApiCallTypesEnum apiCallType, string table, Dictionary<string, string> parameters = default, string schema = default, object obj = default)
+        private async Task<Response> BuildAndExe(ApiCallTypesEnum apiCallType, string table, List<HttpParameter> parameters = default, string schema = default, object obj = default)
         {
             try
             {
