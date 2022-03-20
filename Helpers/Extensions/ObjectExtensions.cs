@@ -1,4 +1,5 @@
 ﻿using CryptoAlertsBot;
+using CryptoAlertsBot.ApiHandler.Helpers;
 using CryptoAlertsBot.ApiHandler.Models;
 using CryptoAlertsBot.Extensions;
 using System.Reflection;
