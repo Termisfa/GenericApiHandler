@@ -1,4 +1,5 @@
-﻿using GenericApiHandler.Data.Enums;
+﻿using CryptoAlertsBot.ApiHandler.Helpers;
+using GenericApiHandler.Data.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,19 @@ namespace GenericApiHandler.Models
 
         public static HttpParameter DefaultParameter(string columnName, string value, ComparatorsEnum comparator = ComparatorsEnum.equals)
         {
+            return new HttpParameter()
+            {
+                Column = columnName,
+                Value = value,
+                Comparator = comparator,
+                IncludesApostrophes = true
+            };
+        }
+
+        public static HttpParameter DefaultParameter(string columnName, DateTime dateValue, ComparatorsEnum comparator = ComparatorsEnum.equals)
+        {
+            string value = Parsers.DatetimeToStringSqlFormat(dateValue);
+
             return new HttpParameter()
             {
                 Column = columnName,

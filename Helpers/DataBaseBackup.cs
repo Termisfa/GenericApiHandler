@@ -52,6 +52,7 @@ namespace GenericApiHandler.Helpers
                                 .GetMethod("GetAllTable")
                                 .MakeGenericMethod(tableType)
                                 .Invoke(_buildAndExeApiCall, new object[] { null, null });
+
                 await task;
 
                 var tableList = (IEnumerable<object>) task.GetType().GetProperty("Result").GetValue(task);
@@ -68,7 +69,6 @@ namespace GenericApiHandler.Helpers
             {
                 throw;
             }
-
         }
     }
 }
