@@ -26,7 +26,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -38,7 +39,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -56,7 +58,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -70,7 +73,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -82,7 +86,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -96,7 +101,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -108,7 +114,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -122,7 +129,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -141,7 +149,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
 
@@ -168,7 +177,8 @@ namespace CryptoAlertsBot.ApiHandler
             }
             catch (Exception e)
             {
-                throw;
+                _logEvent.Log(exc: e);
+                return default;
             }
         }
     }
