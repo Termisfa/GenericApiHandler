@@ -1,19 +1,15 @@
-﻿using CryptoAlertsBot.ApiHandler;
+﻿using CryptoAlertsBot;
+using CryptoAlertsBot.ApiHandler;
 using CryptoAlertsBot.ApiHandler.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GenericApiHandler.Helpers
 {
-    public class DataBaseBackup
+    public class DbBackupExecute
     {
         private readonly BuildAndExeApiCall _buildAndExeApiCall;
 
-        public DataBaseBackup(BuildAndExeApiCall buildAndExeApiCall)
+        public DbBackupExecute(BuildAndExeApiCall buildAndExeApiCall)
         {
             _buildAndExeApiCall = buildAndExeApiCall;
         }
@@ -22,7 +18,12 @@ namespace GenericApiHandler.Helpers
         {
             try
             {
-                string backupResult = $"-- {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}\n\n";
+                string backupResult = $"-- {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")} UTC TIME\n\n";
+
+                string schema = ApiAppSettingsManager.GetApiDefaultSchema();
+                backupResult += $"drop database if exists {schema};\n";
+                backupResult += $"create database {schema};\n";
+                backupResult += $"use {schema};\n";
 
                 foreach (Type tableType in tableTypes)
                 {
@@ -45,7 +46,10 @@ namespace GenericApiHandler.Helpers
                 string tableName = tableType.Name.ToLower();
 
                 string tableBackup = $"-- {tableName} \n\n";
-                tableBackup += $"delete from {tableName};\n\n";
+
+                tableBackup += $"drop table if exists {tableName};\n\n";
+
+                tableBackup += $"{await _buildAndExeApiCall.GetShowCreateTable(tableName)};\n\n";                
 
                 var task = (Task)typeof(BuildAndExeApiCall)
                                 .GetTypeInfo()

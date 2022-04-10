@@ -4,6 +4,7 @@ using GenericApiHandler;
 using GenericApiHandler.Authentication;
 using GenericApiHandler.Data.Enums;
 using GenericApiHandler.Models;
+using System.Text.Json;
 
 namespace CryptoAlertsBot.ApiHandler
 {
@@ -134,6 +135,25 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
+        public async Task<string> GetShowCreateTable(string table, string schema = default)
+        {
+            try
+            {
+                string uri = ApiAppSettingsManager.GetApiBaseUri() + "/ShowCreateTable" + "?table=" + table;
+
+                Response response = await BuildAndExe(ApiCallTypesEnum.Get, table, schema: schema, uri: uri);
+
+                var resultList = JsonSerializer.Deserialize<List<List<string>>>(response.Result);
+
+                return resultList[0][1];
+            }
+            catch (Exception e)
+            {
+                _logEvent.Log(exc: e);
+                return default;
+            }
+        }
+
         private async Task<int> ExeAndParseIntResult(ApiCallTypesEnum apiCallType, string table, List<HttpParameter> parameters = default, string schema = default, object obj = default)
         {
             try
@@ -154,7 +174,7 @@ namespace CryptoAlertsBot.ApiHandler
             }
         }
 
-        private async Task<Response> BuildAndExe(ApiCallTypesEnum apiCallType, string table, List<HttpParameter> parameters = default, string schema = default, object obj = default)
+        private async Task<Response> BuildAndExe(ApiCallTypesEnum apiCallType, string table, List<HttpParameter> parameters = default, string schema = default, object obj = default, string uri = default)
         {
             try
             {
@@ -162,7 +182,7 @@ namespace CryptoAlertsBot.ApiHandler
 
                 HttpObject httpObject = obj == null ? default : new(obj);
 
-                string uri = ApiUriBuilder.BuildUri(table, parameters);
+                uri ??= ApiUriBuilder.BuildUri(table, parameters);
 
                 var httpResponse = await ApiCalls.ExeCall(apiCallType, uri, httpObject, schema: schema, apiToken: _authToken.Token);
 
