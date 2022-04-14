@@ -10,9 +10,8 @@ namespace GenericApiHandler
     public class LogEvent
     {
         public event LogEventHandler FireEvent;
-        public EventArgs e = null;
         public delegate void LogEventHandler(LogEvent m, EventArgs e, Response response = default, Exception exc = default);
-
+        
         public LogEvent()
         {
         }
@@ -21,10 +20,7 @@ namespace GenericApiHandler
         {
             try
             {
-                if (FireEvent != null)
-                {
-                    FireEvent(this, e, response, exc);
-                }
+                FireEvent?.Invoke(this, new(), response, exc);
             }
             catch (Exception e)
             {

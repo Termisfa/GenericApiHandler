@@ -12,7 +12,7 @@ namespace GenericApiHandler.Authentication
 {
     public class AuthToken
     {
-        public string Token { get; set; }
+        public string? Token { get; set; }
 
         private readonly LogEvent _logEvent;
 
@@ -29,7 +29,7 @@ namespace GenericApiHandler.Authentication
 
                 var timer = new System.Timers.Timer(1000 * 60 * 60 * 1); //It should be 1000 * 60 * 60 * 1  (1 hour)
                 timer.Start();
-                timer.Elapsed += TimerCallbackAsync;
+                timer.Elapsed += async (sender, e) => await TimerCallbackAsync(sender, e);
             }
             catch (Exception e)
             {
@@ -50,16 +50,16 @@ namespace GenericApiHandler.Authentication
 
                 string uri = "/Auth/Authenticate";
 
-                var httpResponse = await ApiCalls.ExeCall(ApiCallTypesEnum.Post, uri, authReq);
+                HttpResponseMessage httpResponse = await ApiCalls.ExeCall(ApiCallTypesEnum.Post, uri, authReq);
 
-                AuthenticateResponse response = HttpResponseHandler.GetResponseFromAuthAsync(httpResponse).Result;
+                AuthenticateResponse response = await HttpResponseHandler.GetResponseFromAuthAsync(httpResponse);
 
                 if (response == null)
                 {
-                    string customError = httpResponse.Content.ReadAsStringAsync().Result;
-                    if(string.IsNullOrEmpty(customError))
+                    string customError = await httpResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrEmpty(customError))
                     {
-                        throw new Exception($"Error in Refresh Token. \n Status code: { httpResponse.StatusCode }. Reason: { httpResponse.ReasonPhrase}. \n Stacktrace: \n {httpResponse.RequestMessage.ToString()}");
+                        throw new Exception($"Error in Refresh Token. \n Status code: { httpResponse.StatusCode }. Reason: { httpResponse.ReasonPhrase}. \n Stacktrace: \n {httpResponse.RequestMessage}");
                     }
                     else
                     {
@@ -75,14 +75,15 @@ namespace GenericApiHandler.Authentication
             }
         }
 
-        private void TimerCallbackAsync(object? sender, System.Timers.ElapsedEventArgs elapsed)
+        private Task TimerCallbackAsync(object? sender, System.Timers.ElapsedEventArgs elapsed)
         {
             try
             {
-                RefreshToken();
+                return RefreshToken();
             }
             catch (Exception e)
             {
+                _logEvent.Log(exc: e);
                 throw;
             }
         }

@@ -18,7 +18,7 @@ namespace GenericApiHandler.Helpers
         {
             try
             {
-                string backupResult = $"-- {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")} UTC TIME\n\n";
+                string backupResult = $"-- {DateTime.Now:dd/MM/yyyy HH:mm:ss} UTC TIME\n\n";
 
                 string schema = ApiAppSettingsManager.GetApiDefaultSchema();
                 backupResult += $"drop database if exists {schema};\n";

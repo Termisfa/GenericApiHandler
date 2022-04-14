@@ -14,31 +14,24 @@ namespace CryptoAlertsBot.ApiHandler
                     return default;
                 }
 
-                using (var client = new HttpClient())
+                using var client = new HttpClient();
+                client.BaseAddress = new Uri(baseAddress ?? ApiAppSettingsManager.GetApiBaseAddress());
+
+                client.DefaultRequestHeaders.Add("schema", schema ?? ApiAppSettingsManager.GetApiDefaultSchema());
+
+                if (apiToken != default)
                 {
-                    client.BaseAddress = new Uri(baseAddress ?? ApiAppSettingsManager.GetApiBaseAddress());
-
-                    client.DefaultRequestHeaders.Add("schema", schema ?? ApiAppSettingsManager.GetApiDefaultSchema());
-
-                    if (apiToken != default)
-                    {
-                        client.DefaultRequestHeaders.Add("Authorization", apiToken);
-                    }
-
-                    switch (callType)
-                    {
-                        case ApiCallTypesEnum.Get:
-                            return await client.GetAsync(uri);
-                        case ApiCallTypesEnum.Post:
-                            return await client.PostAsJsonAsync(uri, obj);
-                        case ApiCallTypesEnum.Put:
-                            return await client.PutAsJsonAsync(uri, obj);
-                        case ApiCallTypesEnum.Delete:
-                            return await client.DeleteAsync(uri);
-                        default:
-                            return default;
-                    }
+                    client.DefaultRequestHeaders.Add("Authorization", apiToken);
                 }
+
+                return callType switch
+                {
+                    ApiCallTypesEnum.Get => await client.GetAsync(uri),
+                    ApiCallTypesEnum.Post => await client.PostAsJsonAsync(uri, obj),
+                    ApiCallTypesEnum.Put => await client.PutAsJsonAsync(uri, obj),
+                    ApiCallTypesEnum.Delete => await client.DeleteAsync(uri),
+                    _ => default,
+                };
             }
             catch (Exception e)
             {

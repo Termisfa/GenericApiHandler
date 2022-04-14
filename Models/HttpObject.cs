@@ -1,6 +1,4 @@
-﻿using CryptoAlertsBot.Extensions;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
+﻿using CryptoAlertsBot.ApiHandler.Helpers;
 
 namespace CryptoAlertsBot.ApiHandler.Models
 {
@@ -16,7 +14,7 @@ namespace CryptoAlertsBot.ApiHandler.Models
         {
             try
             {
-                NameValueDict = Helpers.Parsers.ParseObjectToDict(obj);
+                NameValueDict = Parsers.ParseObjectToDict(obj);
             }
             catch (Exception e)
             {
