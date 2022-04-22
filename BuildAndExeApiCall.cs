@@ -4,6 +4,7 @@ using GenericApiHandler;
 using GenericApiHandler.Authentication;
 using GenericApiHandler.Data.Enums;
 using GenericApiHandler.Models;
+using System.Net;
 using System.Text.Json;
 
 namespace CryptoAlertsBot.ApiHandler
@@ -180,13 +181,19 @@ namespace CryptoAlertsBot.ApiHandler
             {
                 schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
 
-                HttpObject httpObject = obj == null ? default : new(obj);
+                HttpObject httpObject = (HttpObject)obj ?? new(obj);
 
                 uri ??= ApiUriBuilder.BuildUri(table, parameters);
 
                 var httpResponse = await ApiCalls.ExeCall(apiCallType, uri, httpObject, schema: schema, apiToken: _authToken.Token);
 
-                Response response = HttpResponseHandler.GetResponseFromHttpAsync(httpResponse).Result;
+                if(httpResponse?.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    await _authToken.RefreshToken();
+                    httpResponse = await ApiCalls.ExeCall(apiCallType, uri, httpObject, schema: schema, apiToken: _authToken.Token);
+                }
+
+                Response response = await HttpResponseHandler.GetResponseFromHttpAsync(httpResponse);
 
                 if (!response.Success)
                 {
