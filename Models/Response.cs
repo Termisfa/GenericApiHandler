@@ -9,7 +9,9 @@ namespace CryptoAlertsBot.ApiHandler.Models
 
         public string Result { get; set; }
 
-        public string UsedQuery { get; set; }
+        public string QueryUsed { get; set; }
+
+        public string UriUsed { get; set; }
 
         public static Response SuccesfulResponse(string result, string query = default)
         {
@@ -17,7 +19,7 @@ namespace CryptoAlertsBot.ApiHandler.Models
             {
                 Success = true,
                 Result = result,
-                UsedQuery = query
+                QueryUsed = query
             };
         }
 
@@ -27,7 +29,7 @@ namespace CryptoAlertsBot.ApiHandler.Models
             {
                 Success = false,
                 ErrorInfo = errorInfo,
-                UsedQuery = query
+                QueryUsed = query
             };
         }
 
@@ -38,7 +40,7 @@ namespace CryptoAlertsBot.ApiHandler.Models
             {
                 Success = false,
                 ErrorInfo = errorInfo,
-                UsedQuery = query
+                QueryUsed = query
             };
         }
     }

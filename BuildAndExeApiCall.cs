@@ -194,6 +194,7 @@ namespace CryptoAlertsBot.ApiHandler
                 }
 
                 Response response = await HttpResponseHandler.GetResponseFromHttpAsync(httpResponse);
+                response.UriUsed = $"{ApiAppSettingsManager.GetApiBaseAddress()}/{uri}";
 
                 if (!response.Success)
                 {
