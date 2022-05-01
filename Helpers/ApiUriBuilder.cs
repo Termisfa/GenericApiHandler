@@ -5,11 +5,18 @@ namespace CryptoAlertsBot.ApiHandler
 {
     public static class ApiUriBuilder
     {
-        public static string BuildUri(string table = default, List<HttpParameter> parameters = default)
+        public static string BuildUri(ApiCallTypesEnum apiCallType, string table, List<HttpParameter> parameters)
         {
             try
             {
-                string result = ApiAppSettingsManager.GetApiBaseUri() + "?table=" + table;
+                string result = ApiAppSettingsManager.GetApiBaseUri();
+
+                if(apiCallType == ApiCallTypesEnum.BulkInsert)
+                {
+                    result += "/BulkInsert";
+                }
+
+                result += "?table=" + table;
 
                 if (parameters != default)
                 {

@@ -10,6 +10,7 @@ namespace GenericApiHandler.Data.Enums
     {
         Get,
         Post,
+        BulkInsert,
         Put,
         Delete
     }

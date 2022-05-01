@@ -4,6 +4,7 @@ using GenericApiHandler;
 using GenericApiHandler.Authentication;
 using GenericApiHandler.Data.Enums;
 using GenericApiHandler.Models;
+using System.Collections;
 using System.Net;
 using System.Text.Json;
 
@@ -70,6 +71,21 @@ namespace CryptoAlertsBot.ApiHandler
             try
             {
                 int result = await ExeAndParseIntResult(ApiCallTypesEnum.Post, table, schema: schema, obj: obj);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logEvent.Log(exc: e);
+                return default;
+            }
+        }
+
+        public async Task<int> BulkInsertPost(string table, object obj, string schema = default)
+        {
+            try
+            {
+                int result = await ExeAndParseIntResult(ApiCallTypesEnum.BulkInsert, table, schema: schema, obj: obj);
 
                 return result;
             }
@@ -181,16 +197,28 @@ namespace CryptoAlertsBot.ApiHandler
             {
                 schema ??= ApiAppSettingsManager.GetApiDefaultSchema();
 
-                HttpObject httpObject = (HttpObject)obj ?? new(obj);
+                object objToSend = null;
 
-                uri ??= ApiUriBuilder.BuildUri(table, parameters);
+                if(obj != default)
+                {
+                    if(obj is IEnumerable)
+                    {
+                        objToSend = BulkInsert.GetBulkInsertFromObj(obj);
+                    }
+                    else
+                    {
+                        objToSend = new HttpObject(obj);
+                    }
+                }
 
-                var httpResponse = await ApiCalls.ExeCall(apiCallType, uri, httpObject, schema: schema, apiToken: _authToken.Token);
+                uri ??= ApiUriBuilder.BuildUri(apiCallType, table, parameters);
+
+                var httpResponse = await ApiCalls.ExeCall(apiCallType, uri, objToSend, schema: schema, apiToken: _authToken.Token);
 
                 if(httpResponse?.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     await _authToken.RefreshToken();
-                    httpResponse = await ApiCalls.ExeCall(apiCallType, uri, httpObject, schema: schema, apiToken: _authToken.Token);
+                    httpResponse = await ApiCalls.ExeCall(apiCallType, uri, objToSend, schema: schema, apiToken: _authToken.Token);
                 }
 
                 Response response = await HttpResponseHandler.GetResponseFromHttpAsync(httpResponse);

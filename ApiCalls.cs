@@ -9,7 +9,7 @@ namespace CryptoAlertsBot.ApiHandler
         {
             try
             {
-                if (obj == default && (callType == ApiCallTypesEnum.Post || callType == ApiCallTypesEnum.Put))
+                if (obj == default && (callType == ApiCallTypesEnum.Post || callType == ApiCallTypesEnum.Put || callType == ApiCallTypesEnum.BulkInsert))
                 {
                     return default;
                 }
@@ -27,7 +27,7 @@ namespace CryptoAlertsBot.ApiHandler
                 return callType switch
                 {
                     ApiCallTypesEnum.Get => await client.GetAsync(uri),
-                    ApiCallTypesEnum.Post => await client.PostAsJsonAsync(uri, obj),
+                    ApiCallTypesEnum.Post or ApiCallTypesEnum.BulkInsert => await client.PostAsJsonAsync(uri, obj),
                     ApiCallTypesEnum.Put => await client.PutAsJsonAsync(uri, obj),
                     ApiCallTypesEnum.Delete => await client.DeleteAsync(uri),
                     _ => default,

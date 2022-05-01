@@ -1,5 +1,7 @@
 ﻿using CryptoAlertsBot.Extensions;
 using GenericApiHandler.Helpers.Extensions;
+using GenericApiHandler.Models;
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
@@ -111,14 +113,68 @@ namespace CryptoAlertsBot.ApiHandler.Helpers
                 IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties().OrderBy(o => ((DisplayAttribute)o.GetCustomAttributes(typeof(DisplayAttribute), false)[0]).Order));
                 for (int i = 0; i < props.Count; i++)
                 {
-                    var propertyInfo = obj.GetType().GetPropertyCustom(i);
+                    var propertyInfo = myType.GetPropertyCustom(i);
                     string castedValue = propertyInfo.GetParsedString(obj);
+
                     if (string.IsNullOrEmpty(castedValue))
+                    {
                         continue;
-                    var propertyName = propertyInfo.Name;
-                    dict.Add(propertyName, castedValue);
+                    }
+
+                    dict.Add(propertyInfo.Name, castedValue);
                 }
                 return dict;
+            }
+            catch (Exception e) { throw; }
+        }
+
+        public static BulkInsert ParseObjToBulkInsert(object obj)
+        {
+            try
+            {
+                BulkInsert result = new BulkInsert();
+
+                List<object> list = ((IEnumerable)obj).Cast<object>().ToList();
+
+                if (list.Count == 0)
+                {
+                    return result;
+                }
+
+                Type myType = list[0].GetType();
+                IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties().OrderBy(o => ((DisplayAttribute)o.GetCustomAttributes(typeof(DisplayAttribute), false)[0]).Order));
+                for (int i = 0; i < props.Count; i++)
+                {
+                    var propertyInfo = myType.GetPropertyCustom(i);
+                    string castedValue = propertyInfo.GetParsedString(list[0]);
+
+                    if (!string.IsNullOrEmpty(castedValue))
+                    {
+                        result.ColumnNames.Add(propertyInfo.Name);
+                    }
+
+                }
+
+                foreach (var preParsedRow in list)
+                {
+                    List<string> parsedRow = new();
+
+                    for (int i = 0; i < props.Count; i++)
+                    {
+                        var propertyInfo = myType.GetPropertyCustom(i);
+                        string castedValue = propertyInfo.GetParsedString(preParsedRow);
+
+                        if (!string.IsNullOrEmpty(castedValue))
+                        {
+                            parsedRow.Add(castedValue);
+                        }
+
+                    }
+
+                    result.Rows.Add(parsedRow);
+                }
+
+                return result;
             }
             catch (Exception e) { throw; }
         }
