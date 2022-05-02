@@ -29,6 +29,17 @@ namespace GenericApiHandler.Models
             };
         }
 
+        public static HttpParameter DefaultParameter(string columnName, double? value, ComparatorsEnum comparator = ComparatorsEnum.equals)
+        {
+            return new HttpParameter()
+            {
+                Column = columnName,
+                Value = value.ToString().Replace(',', '.'),
+                Comparator = comparator,
+                IncludesApostrophes = true
+            };
+        }
+
         public static HttpParameter DefaultParameter(string columnName, DateTime dateValue, ComparatorsEnum comparator = ComparatorsEnum.equals)
         {
             string value = Parsers.DatetimeToStringSqlFormat(dateValue);
