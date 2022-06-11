@@ -1,7 +1,6 @@
-﻿using CryptoAlertsBot;
-using CryptoAlertsBot.ApiHandler.Helpers;
-using CryptoAlertsBot.ApiHandler.Models;
+﻿using CryptoAlertsBot.ApiHandler.Helpers;
 using CryptoAlertsBot.Extensions;
+using System.Globalization;
 using System.Reflection;
 
 namespace GenericApiHandler.Helpers.Extensions
@@ -20,10 +19,8 @@ namespace GenericApiHandler.Helpers.Extensions
 
                     if (actualType == typeof(DateTime))
                         preCastedValue = Parsers.SqlFormatedStringToDateTimeFormat(preCastedValue);
-                    else if (actualType == typeof(Double))
-                        preCastedValue = preCastedValue.Replace('.', ',');
 
-                    safeValue = Convert.ChangeType(preCastedValue, actualType);
+                    safeValue = Convert.ChangeType(preCastedValue, actualType, CultureInfo.InvariantCulture);
                 }
 
                 obj.GetType().GetPropertyCustom(propertyOrderIndex).SetValue(obj, safeValue);
