@@ -17,8 +17,6 @@ namespace GenericApiHandler.Helpers.Extensions
                 {
                     var actualType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
 
-                    if (actualType == typeof(DateTime))
-                        preCastedValue = Parsers.SqlFormatedStringToDateTimeFormat(preCastedValue);
 
                     safeValue = Convert.ChangeType(preCastedValue, actualType, CultureInfo.InvariantCulture);
                 }
